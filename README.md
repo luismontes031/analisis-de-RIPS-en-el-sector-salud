@@ -91,11 +91,7 @@ excel
 
 =SUMAR.SI(facturas_huerfanas!C:C;"SIN USUARIO";facturas_huerfanas!B:B)
 Con estos resultados se generó un resumen comparativo para visualizar la diferencia entre facturación real y facturación huérfana.
-
-📊 Análisis en Power BI
-En Power BI se importó la hoja facturas_huerfanas, que contiene los registros de facturas no asociadas a ningún usuario.
-Estas presentan riesgo de glosa por falta de correspondencia con un paciente.
-
+en excel se creo tabla dinamica y se represento en grafica:
 Se construyeron gráficos comparativos que muestran:
 
 Porcentaje de facturas huérfanas por módulo.
@@ -103,3 +99,89 @@ Porcentaje de facturas huérfanas por módulo.
 Distribución del valor total por tipo de usuario.
 
 Proporción entre facturas reales y huérfanas.
+
+📊 Análisis en Power BI
+En Power BI se importó la hoja facturas_huerfanas, que contiene los registros de facturas no asociadas a ningún usuario.
+Estas presentan riesgo de glosa por falta de correspondencia con un paciente.
+En este proyecto se desarrollaron varias medidas DAX que permiten analizar las **facturas huérfanas** por usuario, identificando los módulos implicados, la cantidad de servicios asociados y la facturación total por cada caso. A continuación se detallan las medidas y su propósito:
+
+---
+
+### 🔹 `Resumen_Huerfanas_Detallado`
+
+```DAX
+Resumen_Huerfanas_Detallado =
+ADDCOLUMNS(
+    SUMMARIZE(
+        facturas_huerfanas,
+        facturas_huerfanas[ID_USUARIO]
+    ),
+    "Modulos_Lista",
+        CONCATENATEX(
+            DISTINCT(
+                SELECTCOLUMNS(
+                    FILTER(
+                        facturas_huerfanas,
+                        facturas_huerfanas[ID_USUARIO] = EARLIER(facturas_huerfanas[ID_USUARIO])
+                    ),
+                    "Modulo", facturas_huerfanas[MODULO]
+                )
+            ),
+            [Modulo],
+            " + ",
+            [Modulo],
+            ASC
+        ),
+    "Cantidad_Modulos",
+        CALCULATE(
+            DISTINCTCOUNT(facturas_huerfanas[MODULO]),
+            facturas_huerfanas[ID_USUARIO] = EARLIER(facturas_huerfanas[ID_USUARIO])
+        )
+)
+Descripción:
+Esta medida crea una tabla resumen por usuario que muestra:
+
+🔸 Modulos_Lista: una lista concatenada con los nombres de los módulos donde el usuario presenta facturas huérfanas (por ejemplo: Consultas + Procedimientos + Medicamentos).
+
+Se construye con CONCATENATEX, que une los nombres de los módulos de manera ordenada y separada por “+”.
+
+🔸 Cantidad_Modulos: calcula el número de módulos distintos asociados al mismo usuario usando DISTINCTCOUNT.
+
+Con esta estructura es posible visualizar de forma resumida qué tan dispersas están las facturas de cada usuario entre los diferentes módulos del sistema.
+
+🔹 Clasificacion
+DAX
+Copiar código
+Clasificacion =
+SWITCH(
+    TRUE(),
+    [Cantidad_Modulos] = 1, "Un solo módulo",
+    [Cantidad_Modulos] = 2, "Dos módulos",
+    [Cantidad_Modulos] = 3, "Tres módulos",
+    [Cantidad_Modulos] >= 4, "Cuatro o más módulos"
+)
+Descripción:
+Esta medida clasifica a cada usuario según la cantidad de módulos en los que presenta facturas huérfanas.
+Permite segmentar fácilmente los casos en categorías analíticas:
+
+Cantidad de módulos	Clasificación
+1	Un solo módulo
+2	Dos módulos
+3	Tres módulos
+4 o más	Cuatro o más módulos
+
+De esta forma se facilita la priorización de casos complejos (usuarios con múltiples módulos afectados).
+
+🔹 Facturacion_Total
+DAX
+Copiar código
+Facturacion_Total =
+SUM(facturas_huerfanas[VALOR_FACTURA])
+Descripción:
+Suma el valor total de las facturas huérfanas por usuario o por conjunto de registros seleccionados.
+Esta medida se utiliza para identificar la magnitud económica del problema y apoyar la toma de decisiones financieras o auditorías internas.
+
+conclusiones finales :
+
+
+
