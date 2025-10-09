@@ -181,7 +181,12 @@ Descripción:
 Suma el valor total de las facturas huérfanas por usuario o por conjunto de registros seleccionados.
 Esta medida se utiliza para identificar la magnitud económica del problema y apoyar la toma de decisiones financieras o auditorías internas.
 
-conclusiones finales :
-
-
+conclusiones finales en facturas huerfanas:
+-El análisis evidenció que el 63 % de las facturas no asociadas a pacientes corresponden al módulo de hospitalización, mientras que el módulo con menor proporción fue medicamentos.
+Este resultado sugiere que la mayor concentración de facturas huérfanas se origina en los procesos administrativos y asistenciales de hospitalización, donde la facturación suele ser más compleja y prolongada en el tiempo, involucrando múltiples servicios (estancia, procedimientos, insumos y honorarios).
+En contraste, los módulos como medicamentos o consulta externa, que tienen flujos de atención más directos y unitarios, presentan menor probabilidad de generar registros sin vinculación al paciente.
+-El hallazgo de que el 11% de las facturas, equivalentes a $159.000.000, no se encuentran asociadas a un ID de paciente evidencia una debilidad significativa en los procesos de registro y control de la facturación. Esta situación puede generar riesgos financieros por facturación no reconocida o glosada, pérdida de ingresos y afectaciones en la trazabilidad y calidad de la información. Se recomienda fortalecer los mecanismos de validación y conciliación entre los registros clínicos y contables para garantizar la integridad y confiabilidad de los datos institucionales.
+-En los módulos de hospitalización, medicamentos y procedimientos se identificaron 47 facturas con registros de paciente existentes en la base, pero sin asociación directa mediante el campo id_paciente.
+Esto indica que la información no presenta pérdida de datos clínicos, sino ruptura en las relaciones entre tablas de facturación y de usuarios, probablemente originada por diferencias en los identificadores o en la integración entre módulos asistenciales y contables.
+Aunque la magnitud del hallazgo es moderada, puede afectar la trazabilidad de costos y la consolidación de RIPS, por lo que se recomienda revisar la integridad referencial del modelo y los procesos de sincronización entre sistemas.
 
